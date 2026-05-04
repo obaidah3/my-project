@@ -5,3 +5,4 @@ timestamp,vehicleId,vehicleType,model,year,speed,rpm,engineTemperature,batteryVo
 2026-05-04 12:28:00,CAR123,Car,audi,2000,200.0,6000,100.0,12.0,80.0,,Good Condition,Acceptable Condition,Normal,MODERATE: Some vehicle systems need attention. Schedule service soon.
 2026-05-04 18:33:14,CAR123,Car,audi,1999,0.0,0,50.0,8.0,1.0,,Good Condition,Critical Condition,Low Fuel,CRITICAL: Vehicle requires immediate attention. Multiple systems need service.
 2026-05-04 18:34:08,CAR2003,Truck,volvo,2000,60.0,3000,100.0,16.0,50.0,,Good Condition,High Voltage,Normal,MODERATE: Some vehicle systems need attention. Schedule service soon.
+2026-05-04 18:55:06,VIN12345678,Car,BMW M340i,2026,250.0,5500,80.0,12.0,10.0,P001,Good Condition,Acceptable Condition,Low Fuel,WARNING: Vehicle has critical conditions. Service required soon.

@@ -1,6 +1,7 @@
 com\vehiclediag\util\ValidationUtil.class
 com\vehiclediag\client\ClientUI.class
 com\vehiclediag\analyzer\DiagnosticService.class
+com\vehiclediag\ui\MainApp.class
 com\vehiclediag\analyzer\EngineAnalyzer.class
 com\vehiclediag\client\DiagnosticClient.class
 com\vehiclediag\model\DiagnosticRequest.class
