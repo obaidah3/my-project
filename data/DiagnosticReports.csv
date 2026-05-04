@@ -1,0 +1,7 @@
+timestamp,vehicleId,vehicleType,model,year,speed,rpm,engineTemperature,batteryVoltage,fuelLevel,faultCode,engineCondition,batteryCondition,fuelCondition,overallSummary
+timestamp,vehicleId,vehicleType,model,year,speed,rpm,engineTemperature,batteryVoltage,fuelLevel,faultCode,engineCondition,batteryCondition,fuelCondition,overallSummary
+2026-05-04 11:02:43,CAR999,Car,AUDI,2000,200.0,7900,120.0,10.5,2.0,P0217,Critical Condition,Critical Condition,Low Fuel,CRITICAL: Vehicle requires immediate attention. Multiple systems need service.
+2026-05-04 11:59:34,CAR123,Car,audi,1999,200.0,7800,90.0,14.0,10.0,,Critical Condition,Good Condition,Low Fuel,CRITICAL: Vehicle requires immediate attention. Multiple systems need service.
+2026-05-04 12:28:00,CAR123,Car,audi,2000,200.0,6000,100.0,12.0,80.0,,Good Condition,Acceptable Condition,Normal,MODERATE: Some vehicle systems need attention. Schedule service soon.
+2026-05-04 18:33:14,CAR123,Car,audi,1999,0.0,0,50.0,8.0,1.0,,Good Condition,Critical Condition,Low Fuel,CRITICAL: Vehicle requires immediate attention. Multiple systems need service.
+2026-05-04 18:34:08,CAR2003,Truck,volvo,2000,60.0,3000,100.0,16.0,50.0,,Good Condition,High Voltage,Normal,MODERATE: Some vehicle systems need attention. Schedule service soon.
