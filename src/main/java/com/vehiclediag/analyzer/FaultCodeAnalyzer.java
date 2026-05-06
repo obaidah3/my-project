@@ -52,12 +52,27 @@ public class FaultCodeAnalyzer implements Analyzer {
     }
 
     private String buildFaultCodeMessage(FaultCode faultCode) {
-        return String.format(
-                "%s: %s | Category: %s | Recommendation: %s",
-                faultCode.getCode(),
-                faultCode.getDescription(),
-                faultCode.getSystemCategory(),
-                faultCode.getRecommendation());
+        StringBuilder sb = new StringBuilder();
+        sb.append(faultCode.getCode()).append(": ").append(faultCode.getDescription()).append("\n");
+        sb.append("Category: ").append(faultCode.getSystemCategory()).append("\n");
+        sb.append("Severity: ").append(faultCode.getSeverity()).append("\n");
+        sb.append("Repair Urgency: ").append(faultCode.getRepairUrgency()).append("\n");
+        sb.append("Estimated Complexity: ").append(faultCode.getEstimatedRepairComplexity()).append("\n");
+        
+        sb.append("\nPossible Causes:\n");
+        for (String cause : faultCode.getPossibleCauses()) {
+            sb.append("  - ").append(cause).append("\n");
+        }
+        
+        sb.append("\nSymptoms:\n");
+        for (String symptom : faultCode.getSymptoms()) {
+            sb.append("  - ").append(symptom).append("\n");
+        }
+        
+        sb.append("\nRecommended Action:\n");
+        sb.append(faultCode.getRecommendation());
+        
+        return sb.toString();
     }
 
     private String getConditionForSeverity(String severity) {

@@ -27,7 +27,9 @@ public final class Constants {
     public static final String[] CSV_HEADERS = {
         "timestamp", "vehicleId", "vehicleType", "model", "year",
         "speed", "rpm", "engineTemperature", "batteryVoltage", "fuelLevel", "faultCode",
-        "engineCondition", "batteryCondition", "fuelCondition", "overallSummary"
+        "oilPressure", "coolantLevel", "transmissionTemperature", "throttlePosition",
+        "mafReading", "oxygenSensorVoltage", "mileage",
+        "engineCondition", "batteryCondition", "fuelCondition", "overallSummary", "healthScore"
     };
 
     // Vehicle Sensor Ranges
@@ -93,6 +95,38 @@ public final class Constants {
     // Fuel Analysis Thresholds
     /** Fuel warning threshold percentage */
     public static final double FUEL_WARNING_THRESHOLD = 15.0;
+
+    // Oil Pressure Analysis Thresholds
+    /** Critical oil pressure minimum in bar */
+    public static final double OIL_PRESSURE_CRITICAL_MIN = 1.5;
+    /** Low oil pressure warning in bar */
+    public static final double OIL_PRESSURE_LOW_MIN = 2.5;
+    /** Good oil pressure maximum in bar */
+    public static final double OIL_PRESSURE_GOOD_MAX = 6.0;
+
+    // Cooling System Analysis Thresholds
+    /** Good coolant level minimum percentage */
+    public static final double COOLANT_GOOD_MIN = 80.0;
+    /** Acceptable coolant level minimum percentage */
+    public static final double COOLANT_ACCEPTABLE_MIN = 60.0;
+    /** Good transmission temperature maximum in Celsius */
+    public static final double TRANSMISSION_GOOD_TEMP_MAX = 90.0;
+    /** Moderate transmission temperature maximum in Celsius */
+    public static final double TRANSMISSION_MODERATE_TEMP_MAX = 110.0;
+
+    // Emission Sensor Analysis Thresholds
+    /** Good oxygen sensor voltage minimum */
+    public static final double O2_SENSOR_GOOD_MIN = 0.4;
+    /** Good oxygen sensor voltage maximum */
+    public static final double O2_SENSOR_GOOD_MAX = 0.6;
+    /** Good MAF reading minimum in g/s */
+    public static final double MAF_READING_GOOD_MIN = 3.0;
+    /** Good MAF reading maximum in g/s (depends on engine load) */
+    public static final double MAF_READING_GOOD_MAX = 150.0;
+
+    // Driving Behavior Thresholds
+    /** High throttle position percentage (aggressive driving) */
+    public static final double THROTTLE_AGGRESSIVE_MIN = 80.0;
 
     // Fault Code Analysis
     /** Common fault codes and their descriptions */

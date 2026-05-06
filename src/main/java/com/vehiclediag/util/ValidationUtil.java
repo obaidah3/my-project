@@ -224,6 +224,104 @@ public final class ValidationUtil {
         }
     }
 
+    /**
+     * Validates oil pressure in bar.
+     * Oil pressure must be between 0 and 10 bar.
+     *
+     * @param oilPressure the oil pressure value to validate
+     * @throws IllegalArgumentException if oil pressure is outside valid range
+     */
+    public static void validateOilPressure(double oilPressure) {
+        if (oilPressure < 0 || oilPressure > 10.0) {
+            throw new IllegalArgumentException(
+                "Oil pressure must be between 0 and 10 bar. Got: " + oilPressure);
+        }
+    }
+
+    /**
+     * Validates coolant level percentage.
+     * Coolant level must be between 0 and 100 percent.
+     *
+     * @param coolantLevel the coolant level to validate
+     * @throws IllegalArgumentException if coolant level is outside valid range
+     */
+    public static void validateCoolantLevel(double coolantLevel) {
+        if (coolantLevel < 0 || coolantLevel > 100.0) {
+            throw new IllegalArgumentException(
+                "Coolant level must be between 0 and 100 percent. Got: " + coolantLevel);
+        }
+    }
+
+    /**
+     * Validates transmission temperature in Celsius.
+     * Transmission temperature must be between 30 and 150 Celsius.
+     *
+     * @param transmissionTemperature the transmission temperature to validate
+     * @throws IllegalArgumentException if temperature is outside valid range
+     */
+    public static void validateTransmissionTemperature(double transmissionTemperature) {
+        if (transmissionTemperature < 30.0 || transmissionTemperature > 150.0) {
+            throw new IllegalArgumentException(
+                "Transmission temperature must be between 30 and 150 °C. Got: " + transmissionTemperature);
+        }
+    }
+
+    /**
+     * Validates throttle position percentage.
+     * Throttle position must be between 0 and 100 percent.
+     *
+     * @param throttlePosition the throttle position to validate
+     * @throws IllegalArgumentException if throttle position is outside valid range
+     */
+    public static void validateThrottlePosition(double throttlePosition) {
+        if (throttlePosition < 0 || throttlePosition > 100.0) {
+            throw new IllegalArgumentException(
+                "Throttle position must be between 0 and 100 percent. Got: " + throttlePosition);
+        }
+    }
+
+    /**
+     * Validates MAF reading in grams per second.
+     * MAF reading must be between 0 and 300 g/s.
+     *
+     * @param mafReading the MAF reading to validate
+     * @throws IllegalArgumentException if MAF reading is outside valid range
+     */
+    public static void validateMafReading(double mafReading) {
+        if (mafReading < 0 || mafReading > 300.0) {
+            throw new IllegalArgumentException(
+                "MAF reading must be between 0 and 300 g/s. Got: " + mafReading);
+        }
+    }
+
+    /**
+     * Validates oxygen sensor voltage.
+     * Oxygen sensor voltage must be between 0 and 1.0 V.
+     *
+     * @param oxygenSensorVoltage the oxygen sensor voltage to validate
+     * @throws IllegalArgumentException if voltage is outside valid range
+     */
+    public static void validateOxygenSensorVoltage(double oxygenSensorVoltage) {
+        if (oxygenSensorVoltage < 0 || oxygenSensorVoltage > 1.0) {
+            throw new IllegalArgumentException(
+                "Oxygen sensor voltage must be between 0 and 1.0 V. Got: " + oxygenSensorVoltage);
+        }
+    }
+
+    /**
+     * Validates vehicle mileage in kilometers.
+     * Mileage must be between 0 and 1,000,000 km.
+     *
+     * @param mileage the vehicle mileage to validate
+     * @throws IllegalArgumentException if mileage is outside valid range
+     */
+    public static void validateMileage(int mileage) {
+        if (mileage < 0 || mileage > 1000000) {
+            throw new IllegalArgumentException(
+                "Vehicle mileage must be between 0 and 1,000,000 km. Got: " + mileage);
+        }
+    }
+
     // Utility class - prevent instantiation
     private ValidationUtil() {
         throw new UnsupportedOperationException("ValidationUtil class cannot be instantiated");

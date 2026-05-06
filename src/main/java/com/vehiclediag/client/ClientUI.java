@@ -114,7 +114,14 @@ public class ClientUI {
                     sensorData.engineTemperature,
                     sensorData.batteryVoltage,
                     sensorData.fuelLevel,
-                    sensorData.faultCode
+                    sensorData.faultCode,
+                    sensorData.oilPressure,
+                    sensorData.coolantLevel,
+                    sensorData.transmissionTemperature,
+                    sensorData.throttlePosition,
+                    sensorData.mafReading,
+                    sensorData.oxygenSensorVoltage,
+                    sensorData.mileage
             );
 
             // Send to server
@@ -227,6 +234,13 @@ public class ClientUI {
         double temperature = getDoubleInput("Engine Temperature (50-120 °C): ", Constants.MIN_TEMP_C, Constants.MAX_TEMP_C);
         double batteryVoltage = getDoubleInput("Battery Voltage (8-16 V): ", Constants.MIN_BATTERY_V, Constants.MAX_BATTERY_V);
         double fuelLevel = getDoubleInput("Fuel Level (0-100 %): ", Constants.MIN_FUEL_LEVEL, Constants.MAX_FUEL_LEVEL);
+        double oilPressure = getDoubleInput("Oil Pressure (0-10 bar): ", 0, 10.0);
+        double coolantLevel = getDoubleInput("Coolant Level (0-100 %): ", 0, 100.0);
+        double transmissionTemperature = getDoubleInput("Transmission Temperature (30-150 °C): ", 30.0, 150.0);
+        double throttlePosition = getDoubleInput("Throttle Position (0-100 %): ", 0, 100.0);
+        double mafReading = getDoubleInput("MAF Reading (0-300 g/s): ", 0, 300.0);
+        double oxygenSensorVoltage = getDoubleInput("Oxygen Sensor Voltage (0-1.0 V): ", 0, 1.0);
+        int mileage = getIntInput("Mileage (0-1000000 km): ", 0, 1000000);
 
         System.out.print("Fault Code (or press Enter if none): ");
         String faultCode = scanner.nextLine().trim();
@@ -234,7 +248,9 @@ public class ClientUI {
             faultCode = null;
         }
 
-        return new SensorData(speed, rpm, temperature, batteryVoltage, fuelLevel, faultCode);
+        return new SensorData(speed, rpm, temperature, batteryVoltage, fuelLevel, faultCode,
+                             oilPressure, coolantLevel, transmissionTemperature, throttlePosition,
+                             mafReading, oxygenSensorVoltage, mileage);
     }
 
     /**
@@ -317,14 +333,31 @@ public class ClientUI {
         final double batteryVoltage;
         final double fuelLevel;
         final String faultCode;
+        final double oilPressure;
+        final double coolantLevel;
+        final double transmissionTemperature;
+        final double throttlePosition;
+        final double mafReading;
+        final double oxygenSensorVoltage;
+        final int mileage;
 
-        SensorData(double speed, int rpm, double engineTemperature, double batteryVoltage, double fuelLevel, String faultCode) {
+        SensorData(double speed, int rpm, double engineTemperature, double batteryVoltage,
+                   double fuelLevel, String faultCode, double oilPressure, double coolantLevel,
+                   double transmissionTemperature, double throttlePosition, double mafReading,
+                   double oxygenSensorVoltage, int mileage) {
             this.speed = speed;
             this.rpm = rpm;
             this.engineTemperature = engineTemperature;
             this.batteryVoltage = batteryVoltage;
             this.fuelLevel = fuelLevel;
             this.faultCode = faultCode;
+            this.oilPressure = oilPressure;
+            this.coolantLevel = coolantLevel;
+            this.transmissionTemperature = transmissionTemperature;
+            this.throttlePosition = throttlePosition;
+            this.mafReading = mafReading;
+            this.oxygenSensorVoltage = oxygenSensorVoltage;
+            this.mileage = mileage;
         }
     }
 

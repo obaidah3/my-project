@@ -24,24 +24,107 @@ public class DiagnosticReport implements Serializable {
     private final String engineCondition;
     private final String batteryCondition;
     private final String fuelCondition;
+    private final String oilPressureCondition;
+    private final String coolingCondition;
+    private final String transmissionCondition;
+    private final String emissionCondition;
+    private final String drivingBehaviorCondition;
     private final String overallSummary;
     private final String faultDetails;
+    private final int healthScore;
+    private final double oilPressure;
+    private final double coolantLevel;
+    private final double transmissionTemperature;
+    private final double throttlePosition;
+    private final double mafReading;
+    private final double oxygenSensorVoltage;
+    private final int mileage;
 
     /**
-     * Creates a new DiagnosticReport with analysis results.
-     *
-     * @param vehicle the vehicle that was diagnosed
-     * @param speed vehicle speed at time of diagnosis
-     * @param rpm engine RPM at time of diagnosis
-     * @param engineTemperature engine temperature at time of diagnosis
-     * @param batteryVoltage battery voltage at time of diagnosis
-     * @param fuelLevel fuel level at time of diagnosis
-     * @param faultCode reported fault code, may be null or empty
-     * @param engineCondition analysis result from engine analyzer
-     * @param batteryCondition analysis result from battery analyzer
-     * @param fuelCondition analysis result from fuel analyzer
-     * @param overallSummary overall diagnostic summary
-     * @param faultDetails details of any detected faults
+     * Creates a new DiagnosticReport with extended sensor data and health score.
+     */
+    public DiagnosticReport(Vehicle vehicle,
+                           double speed,
+                           int rpm,
+                           double engineTemperature,
+                           double batteryVoltage,
+                           double fuelLevel,
+                           String faultCode,
+                           String engineCondition,
+                           String batteryCondition,
+                           String fuelCondition,
+                           String oilPressureCondition,
+                           String coolingCondition,
+                           String transmissionCondition,
+                           String emissionCondition,
+                           String drivingBehaviorCondition,
+                           String overallSummary,
+                           String faultDetails,
+                           int healthScore,
+                           double oilPressure,
+                           double coolantLevel,
+                           double transmissionTemperature,
+                           double throttlePosition,
+                           double mafReading,
+                           double oxygenSensorVoltage,
+                           int mileage) {
+        this.timestamp = LocalDateTime.now();
+        this.vehicle = vehicle;
+        this.speed = speed;
+        this.rpm = rpm;
+        this.engineTemperature = engineTemperature;
+        this.batteryVoltage = batteryVoltage;
+        this.fuelLevel = fuelLevel;
+        this.faultCode = faultCode;
+        this.engineCondition = engineCondition;
+        this.batteryCondition = batteryCondition;
+        this.fuelCondition = fuelCondition;
+        this.oilPressureCondition = oilPressureCondition;
+        this.coolingCondition = coolingCondition;
+        this.transmissionCondition = transmissionCondition;
+        this.emissionCondition = emissionCondition;
+        this.drivingBehaviorCondition = drivingBehaviorCondition;
+        this.overallSummary = overallSummary;
+        this.faultDetails = faultDetails;
+        this.healthScore = healthScore;
+        this.oilPressure = oilPressure;
+        this.coolantLevel = coolantLevel;
+        this.transmissionTemperature = transmissionTemperature;
+        this.throttlePosition = throttlePosition;
+        this.mafReading = mafReading;
+        this.oxygenSensorVoltage = oxygenSensorVoltage;
+        this.mileage = mileage;
+        validate();
+    }
+
+    /**
+     * Creates a new DiagnosticReport with analysis results and health score (backward compat).
+     * Extended sensor fields default to safe values.
+     */
+    public DiagnosticReport(Vehicle vehicle,
+                           double speed,
+                           int rpm,
+                           double engineTemperature,
+                           double batteryVoltage,
+                           double fuelLevel,
+                           String faultCode,
+                           String engineCondition,
+                           String batteryCondition,
+                           String fuelCondition,
+                           String overallSummary,
+                           String faultDetails,
+                           int healthScore) {
+        this(vehicle, speed, rpm, engineTemperature, batteryVoltage, fuelLevel, faultCode,
+             engineCondition, batteryCondition, fuelCondition,
+             "Oil Pressure Normal", "Cooling System Healthy", "Transmission Healthy",
+             "Emission Sensors Normal", "Normal Driving Behavior",
+             overallSummary, faultDetails, healthScore,
+             0.0, 100.0, 80.0, 0.0, 0.0, 0.45, 0);
+    }
+
+    /**
+     * Creates a new DiagnosticReport with a default health score of 100.
+     * This overload preserves compatibility for callers that do not provide a score.
      */
     public DiagnosticReport(Vehicle vehicle,
                            double speed,
@@ -55,20 +138,8 @@ public class DiagnosticReport implements Serializable {
                            String fuelCondition,
                            String overallSummary,
                            String faultDetails) {
-        this.timestamp = LocalDateTime.now();
-        this.vehicle = vehicle;
-        this.speed = speed;
-        this.rpm = rpm;
-        this.engineTemperature = engineTemperature;
-        this.batteryVoltage = batteryVoltage;
-        this.fuelLevel = fuelLevel;
-        this.faultCode = faultCode;
-        this.engineCondition = engineCondition;
-        this.batteryCondition = batteryCondition;
-        this.fuelCondition = fuelCondition;
-        this.overallSummary = overallSummary;
-        this.faultDetails = faultDetails;
-        validate();
+        this(vehicle, speed, rpm, engineTemperature, batteryVoltage, fuelLevel, faultCode,
+             engineCondition, batteryCondition, fuelCondition, overallSummary, faultDetails, 100);
     }
 
     /**
@@ -89,11 +160,29 @@ public class DiagnosticReport implements Serializable {
         if (fuelCondition == null || fuelCondition.trim().isEmpty()) {
             throw new IllegalArgumentException("Fuel condition cannot be null or empty");
         }
+        if (oilPressureCondition == null || oilPressureCondition.trim().isEmpty()) {
+            throw new IllegalArgumentException("Oil pressure condition cannot be null or empty");
+        }
+        if (coolingCondition == null || coolingCondition.trim().isEmpty()) {
+            throw new IllegalArgumentException("Cooling condition cannot be null or empty");
+        }
+        if (transmissionCondition == null || transmissionCondition.trim().isEmpty()) {
+            throw new IllegalArgumentException("Transmission condition cannot be null or empty");
+        }
+        if (emissionCondition == null || emissionCondition.trim().isEmpty()) {
+            throw new IllegalArgumentException("Emission condition cannot be null or empty");
+        }
+        if (drivingBehaviorCondition == null || drivingBehaviorCondition.trim().isEmpty()) {
+            throw new IllegalArgumentException("Driving behavior condition cannot be null or empty");
+        }
         if (overallSummary == null || overallSummary.trim().isEmpty()) {
             throw new IllegalArgumentException("Overall summary cannot be null or empty");
         }
         if (faultDetails == null) {
             throw new IllegalArgumentException("Fault details cannot be null");
+        }
+        if (healthScore < 0 || healthScore > 100) {
+            throw new IllegalArgumentException("Health score must be between 0 and 100");
         }
     }
 
@@ -129,6 +218,10 @@ public class DiagnosticReport implements Serializable {
         return faultCode;
     }
 
+    public int getHealthScore() {
+        return healthScore;
+    }
+
     public String getEngineCondition() {
         return engineCondition;
     }
@@ -141,12 +234,60 @@ public class DiagnosticReport implements Serializable {
         return fuelCondition;
     }
 
+    public String getOilPressureCondition() {
+        return oilPressureCondition;
+    }
+
+    public String getCoolingCondition() {
+        return coolingCondition;
+    }
+
+    public String getTransmissionCondition() {
+        return transmissionCondition;
+    }
+
+    public String getEmissionCondition() {
+        return emissionCondition;
+    }
+
+    public String getDrivingBehaviorCondition() {
+        return drivingBehaviorCondition;
+    }
+
     public String getOverallSummary() {
         return overallSummary;
     }
 
     public String getFaultDetails() {
         return faultDetails;
+    }
+
+    public double getOilPressure() {
+        return oilPressure;
+    }
+
+    public double getCoolantLevel() {
+        return coolantLevel;
+    }
+
+    public double getTransmissionTemperature() {
+        return transmissionTemperature;
+    }
+
+    public double getThrottlePosition() {
+        return throttlePosition;
+    }
+
+    public double getMafReading() {
+        return mafReading;
+    }
+
+    public double getOxygenSensorVoltage() {
+        return oxygenSensorVoltage;
+    }
+
+    public int getMileage() {
+        return mileage;
     }
 
     /**
@@ -170,11 +311,24 @@ public class DiagnosticReport implements Serializable {
         sb.append("Battery Voltage: ").append(batteryVoltage).append(" V\n");
         sb.append("Fuel Level: ").append(fuelLevel).append(" %\n");
         sb.append("Fault Code: ").append(faultCode != null ? faultCode : "None").append("\n");
+        sb.append("Oil Pressure: ").append(String.format("%.1f", oilPressure)).append(" bar\n");
+        sb.append("Coolant Level: ").append(String.format("%.1f", coolantLevel)).append(" %\n");
+        sb.append("Transmission Temperature: ").append(String.format("%.1f", transmissionTemperature)).append(" °C\n");
+        sb.append("Throttle Position: ").append(String.format("%.1f", throttlePosition)).append(" %\n");
+        sb.append("MAF Reading: ").append(String.format("%.1f", mafReading)).append(" g/s\n");
+        sb.append("Oxygen Sensor Voltage: ").append(String.format("%.2f", oxygenSensorVoltage)).append(" V\n");
+        sb.append("Mileage: ").append(mileage).append(" km\n");
         sb.append("\n--- Analysis Results ---\n");
         sb.append("Engine Condition: ").append(engineCondition).append("\n");
         sb.append("Battery Condition: ").append(batteryCondition).append("\n");
         sb.append("Fuel Condition: ").append(fuelCondition).append("\n");
+        sb.append("Oil Pressure Condition: ").append(oilPressureCondition).append("\n");
+        sb.append("Cooling System Condition: ").append(coolingCondition).append("\n");
+        sb.append("Transmission Condition: ").append(transmissionCondition).append("\n");
+        sb.append("Emission Condition: ").append(emissionCondition).append("\n");
+        sb.append("Driving Behavior: ").append(drivingBehaviorCondition).append("\n");
         sb.append("\nOverall Summary: ").append(overallSummary).append("\n");
+        sb.append("Health Score: ").append(healthScore).append("/100\n");
         if (!faultDetails.isEmpty()) {
             sb.append("\nFault Details: ").append(faultDetails).append("\n");
         }

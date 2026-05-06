@@ -4,6 +4,8 @@ import com.vehiclediag.model.DiagnosticReport;
 import com.vehiclediag.util.Constants;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -18,6 +20,7 @@ import java.time.format.DateTimeFormatter;
  */
 public class ReportStorage {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReportStorage.class);
     private static final String DATA_DIRECTORY = "data";
     private static final String CSV_FILE_PATH = DATA_DIRECTORY + File.separator + Constants.CSV_FILE;
     private static final DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -47,6 +50,13 @@ public class ReportStorage {
             throw new IllegalArgumentException("DiagnosticReport cannot be null");
         }
 
+        try {
+            String absolutePath = new File(CSV_FILE_PATH).getAbsolutePath();
+            LOGGER.info("Storing diagnostic report to CSV at: {}", absolutePath);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to log absolute path", e);
+        }
+
         synchronized (fileLock) {
             boolean fileExists = Files.exists(Paths.get(CSV_FILE_PATH));
             boolean fileIsEmpty = fileExists && Files.size(Paths.get(CSV_FILE_PATH)) == 0;
@@ -72,10 +82,18 @@ public class ReportStorage {
                         String.format("%.1f", report.getBatteryVoltage()),
                         String.format("%.1f", report.getFuelLevel()),
                         report.getFaultCode() != null ? report.getFaultCode() : "",
+                        String.format("%.1f", report.getOilPressure()),
+                        String.format("%.1f", report.getCoolantLevel()),
+                        String.format("%.1f", report.getTransmissionTemperature()),
+                        String.format("%.1f", report.getThrottlePosition()),
+                        String.format("%.1f", report.getMafReading()),
+                        String.format("%.2f", report.getOxygenSensorVoltage()),
+                        report.getMileage(),
                         report.getEngineCondition(),
                         report.getBatteryCondition(),
                         report.getFuelCondition(),
-                        report.getOverallSummary()
+                        report.getOverallSummary(),
+                        report.getHealthScore()
                 );
 
                 csvPrinter.flush();

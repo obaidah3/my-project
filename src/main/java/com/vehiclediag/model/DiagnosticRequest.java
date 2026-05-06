@@ -18,9 +18,16 @@ public class DiagnosticRequest implements Serializable {
     private final double batteryVoltage;
     private final double fuelLevel;
     private final String faultCode;
+    private final double oilPressure;
+    private final double coolantLevel;
+    private final double transmissionTemperature;
+    private final double throttlePosition;
+    private final double mafReading;
+    private final double oxygenSensorVoltage;
+    private final int mileage;
 
     /**
-     * Creates a new DiagnosticRequest.
+     * Creates a new DiagnosticRequest with extended sensor data.
      *
      * @param vehicle the vehicle being diagnosed
      * @param speed current vehicle speed in km/h
@@ -29,6 +36,13 @@ public class DiagnosticRequest implements Serializable {
      * @param batteryVoltage current battery voltage in volts
      * @param fuelLevel current fuel level percentage
      * @param faultCode reported fault code, may be null or empty
+     * @param oilPressure current oil pressure in bar
+     * @param coolantLevel current coolant level percentage
+     * @param transmissionTemperature current transmission temperature in Celsius
+     * @param throttlePosition current throttle position percentage
+     * @param mafReading current mass air flow reading in g/s
+     * @param oxygenSensorVoltage current oxygen sensor voltage
+     * @param mileage vehicle mileage in kilometers
      */
     public DiagnosticRequest(Vehicle vehicle,
                              double speed,
@@ -36,7 +50,14 @@ public class DiagnosticRequest implements Serializable {
                              double engineTemperature,
                              double batteryVoltage,
                              double fuelLevel,
-                             String faultCode) {
+                             String faultCode,
+                             double oilPressure,
+                             double coolantLevel,
+                             double transmissionTemperature,
+                             double throttlePosition,
+                             double mafReading,
+                             double oxygenSensorVoltage,
+                             int mileage) {
         this.vehicle = vehicle;
         this.speed = speed;
         this.rpm = rpm;
@@ -44,6 +65,13 @@ public class DiagnosticRequest implements Serializable {
         this.batteryVoltage = batteryVoltage;
         this.fuelLevel = fuelLevel;
         this.faultCode = faultCode;
+        this.oilPressure = oilPressure;
+        this.coolantLevel = coolantLevel;
+        this.transmissionTemperature = transmissionTemperature;
+        this.throttlePosition = throttlePosition;
+        this.mafReading = mafReading;
+        this.oxygenSensorVoltage = oxygenSensorVoltage;
+        this.mileage = mileage;
         validate();
     }
 
@@ -66,6 +94,13 @@ public class DiagnosticRequest implements Serializable {
         ValidationUtil.validateBatteryVoltage(batteryVoltage);
         ValidationUtil.validateFuelLevel(fuelLevel);
         ValidationUtil.validateFaultCode(faultCode);
+        ValidationUtil.validateOilPressure(oilPressure);
+        ValidationUtil.validateCoolantLevel(coolantLevel);
+        ValidationUtil.validateTransmissionTemperature(transmissionTemperature);
+        ValidationUtil.validateThrottlePosition(throttlePosition);
+        ValidationUtil.validateMafReading(mafReading);
+        ValidationUtil.validateOxygenSensorVoltage(oxygenSensorVoltage);
+        ValidationUtil.validateMileage(mileage);
     }
 
     public Vehicle getVehicle() {
@@ -94,5 +129,33 @@ public class DiagnosticRequest implements Serializable {
 
     public String getFaultCode() {
         return faultCode;
+    }
+
+    public double getOilPressure() {
+        return oilPressure;
+    }
+
+    public double getCoolantLevel() {
+        return coolantLevel;
+    }
+
+    public double getTransmissionTemperature() {
+        return transmissionTemperature;
+    }
+
+    public double getThrottlePosition() {
+        return throttlePosition;
+    }
+
+    public double getMafReading() {
+        return mafReading;
+    }
+
+    public double getOxygenSensorVoltage() {
+        return oxygenSensorVoltage;
+    }
+
+    public int getMileage() {
+        return mileage;
     }
 }
