@@ -28,26 +28,29 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+
+
 
 /**
  * Professional JavaFX Dashboard for Vehicle Diagnostic System.
@@ -56,6 +59,10 @@ import java.util.Map;
 public class MainApp extends Application {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainApp.class);
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     // Form fields
     private TextField vehicleIdField;
@@ -104,24 +111,19 @@ public class MainApp extends Application {
 
         BorderPane root = new BorderPane();
         root.getStyleClass().add("dashboard-root");
-
-        // Build sections
         root.setTop(buildTitleBar());
-        root.setCenter(buildMainPane());
-        root.setBottom(buildBottomPanel());
+        root.setCenter(buildTabPane());
 
-        // Load stylesheet
         String css = getClass().getResource("/styles/dashboard.css").toExternalForm();
-        Scene scene = new Scene(root, 1280, 760);
+        Scene scene = new Scene(root, 1200, 720);
         scene.getStylesheets().add(css);
 
         primaryStage.setScene(scene);
-        primaryStage.setMinWidth(1100);
+        primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(650);
         primaryStage.centerOnScreen();
         primaryStage.show();
 
-        // Initial data load
         loadHistory();
     }
 
@@ -146,51 +148,31 @@ public class MainApp extends Application {
         return titleBar;
     }
 
-    private SplitPane buildMainPane() {
-        ScrollPane leftPane = buildLeftPanel();
-        leftPane.setPrefWidth(340);
-        leftPane.setMinWidth(320);
-        leftPane.setMaxWidth(360);
+    private TabPane buildTabPane() {
+        TabPane tabPane = new TabPane();
+        tabPane.getStyleClass().add("dashboard-tab-pane");
 
-        VBox centerPane = buildCenterPanel();
-        centerPane.setPrefWidth(450);
-        centerPane.setMinWidth(400);
+        Tab diagnosisTab = new Tab("New Diagnosis", buildDiagnosisTab());
+        Tab historyTab = new Tab("History", buildHistoryTab());
+        Tab analyticsTab = new Tab("Analytics", buildAnalyticsTab());
 
-        VBox rightPane = buildRightPanel();
-        rightPane.setPrefWidth(360);
-        rightPane.setMinWidth(340);
-        rightPane.setMaxWidth(380);
+        diagnosisTab.setClosable(false);
+        historyTab.setClosable(false);
+        analyticsTab.setClosable(false);
 
-        SplitPane splitPane = new SplitPane(leftPane, centerPane, rightPane);
-        splitPane.setDividerPositions(0.27, 0.65);
-        splitPane.setStyle("-fx-background-color: transparent;");
-        return splitPane;
+        tabPane.getTabs().addAll(diagnosisTab, historyTab, analyticsTab);
+        return tabPane;
     }
 
-    private ScrollPane buildLeftPanel() {
-        VBox content = new VBox(14);
-        content.getStyleClass().add("side-panel");
-        content.setPadding(new Insets(16));
+    private VBox buildDiagnosisTab() {
+        // Left form section wrapped in a single scroll pane for smaller screens.
+        VBox formContent = new VBox(12);
+        formContent.setPadding(new Insets(12));
+        formContent.setFillWidth(true);
+        formContent.setMaxWidth(480);
 
-        content.getChildren().addAll(
-                buildVehicleCard(),
-                buildBasicSensorsCard(),
-                buildAdvancedSensorsCard(),
-                buildSubmitPanel()
-        );
-
-        ScrollPane scrollPane = new ScrollPane(content);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setStyle("-fx-background: transparent; -fx-padding: 0;");
-        return scrollPane;
-    }
-
-    private Pane buildVehicleCard() {
-        VBox card = createCard("Vehicle Info");
-        GridPane grid = createFormGrid();
-
+        VBox vehicleSection = createCard("Vehicle Information");
+        GridPane vehicleGrid = createFormGrid();
         vehicleIdField = createFormField();
         vehicleTypeCombo = new ComboBox<>();
         vehicleTypeCombo.getItems().addAll("Car", "Truck");
@@ -198,49 +180,37 @@ public class MainApp extends Application {
         vehicleTypeCombo.getStyleClass().add("combo-box");
         modelField = createFormField();
         yearField = createFormField();
+        vehicleGrid.add(createLabel("Vehicle ID:"), 0, 0);
+        vehicleGrid.add(vehicleIdField, 1, 0);
+        vehicleGrid.add(createLabel("Type:"), 0, 1);
+        vehicleGrid.add(vehicleTypeCombo, 1, 1);
+        vehicleGrid.add(createLabel("Model:"), 0, 2);
+        vehicleGrid.add(modelField, 1, 2);
+        vehicleGrid.add(createLabel("Year:"), 0, 3);
+        vehicleGrid.add(yearField, 1, 3);
+        vehicleSection.getChildren().add(vehicleGrid);
 
-        grid.add(createLabel("Vehicle ID:"), 0, 0);
-        grid.add(vehicleIdField, 1, 0);
-        grid.add(createLabel("Type:"), 0, 1);
-        grid.add(vehicleTypeCombo, 1, 1);
-        grid.add(createLabel("Model:"), 0, 2);
-        grid.add(modelField, 1, 2);
-        grid.add(createLabel("Year:"), 0, 3);
-        grid.add(yearField, 1, 3);
-
-        card.getChildren().add(grid);
-        return card;
-    }
-
-    private Pane buildBasicSensorsCard() {
-        VBox card = createCard("Basic Sensors");
-        GridPane grid = createFormGrid();
-
+        VBox basicSection = createCard("Basic Sensors");
+        GridPane basicGrid = createFormGrid();
         speedField = createFormField();
         rpmField = createFormField();
         temperatureField = createFormField();
         batteryVoltageField = createFormField();
         fuelLevelField = createFormField();
+        basicGrid.add(createLabel("Speed (km/h):"), 0, 0);
+        basicGrid.add(speedField, 1, 0);
+        basicGrid.add(createLabel("RPM:"), 0, 1);
+        basicGrid.add(rpmField, 1, 1);
+        basicGrid.add(createLabel("Temp (°C):"), 0, 2);
+        basicGrid.add(temperatureField, 1, 2);
+        basicGrid.add(createLabel("Battery (V):"), 0, 3);
+        basicGrid.add(batteryVoltageField, 1, 3);
+        basicGrid.add(createLabel("Fuel (%):"), 0, 4);
+        basicGrid.add(fuelLevelField, 1, 4);
+        basicSection.getChildren().add(basicGrid);
 
-        grid.add(createLabel("Speed (km/h):"), 0, 0);
-        grid.add(speedField, 1, 0);
-        grid.add(createLabel("RPM:"), 0, 1);
-        grid.add(rpmField, 1, 1);
-        grid.add(createLabel("Temp (°C):"), 0, 2);
-        grid.add(temperatureField, 1, 2);
-        grid.add(createLabel("Battery (V):"), 0, 3);
-        grid.add(batteryVoltageField, 1, 3);
-        grid.add(createLabel("Fuel (%):"), 0, 4);
-        grid.add(fuelLevelField, 1, 4);
-
-        card.getChildren().add(grid);
-        return card;
-    }
-
-    private Pane buildAdvancedSensorsCard() {
-        VBox card = createCard("Advanced Sensors");
-        GridPane grid = createFormGrid();
-
+        VBox advancedSection = createCard("Advanced Sensors");
+        GridPane advancedGrid = createFormGrid();
         oilPressureField = createFormField();
         coolantLevelField = createFormField();
         transmissionTemperatureField = createFormField();
@@ -248,213 +218,110 @@ public class MainApp extends Application {
         mafReadingField = createFormField();
         oxygenSensorVoltageField = createFormField();
         mileageField = createFormField();
+        advancedGrid.add(createLabel("Oil Pressure:"), 0, 0);
+        advancedGrid.add(oilPressureField, 1, 0);
+        advancedGrid.add(createLabel("Coolant (%):"), 0, 1);
+        advancedGrid.add(coolantLevelField, 1, 1);
+        advancedGrid.add(createLabel("Trans Temp (°C):"), 0, 2);
+        advancedGrid.add(transmissionTemperatureField, 1, 2);
+        advancedGrid.add(createLabel("Throttle (%):"), 0, 3);
+        advancedGrid.add(throttlePositionField, 1, 3);
+        advancedGrid.add(createLabel("MAF:"), 0, 4);
+        advancedGrid.add(mafReadingField, 1, 4);
+        advancedGrid.add(createLabel("O2 Sensor (V):"), 0, 5);
+        advancedGrid.add(oxygenSensorVoltageField, 1, 5);
+        advancedGrid.add(createLabel("Mileage (km):"), 0, 6);
+        advancedGrid.add(mileageField, 1, 6);
+        advancedSection.getChildren().add(advancedGrid);
+
+        VBox faultSection = createCard("Fault Code");
+        GridPane faultGrid = createFormGrid();
         faultCodeField = createFormField();
-
-        grid.add(createLabel("Oil Pressure:"), 0, 0);
-        grid.add(oilPressureField, 1, 0);
-        grid.add(createLabel("Coolant (%):"), 0, 1);
-        grid.add(coolantLevelField, 1, 1);
-        grid.add(createLabel("Trans Temp (°C):"), 0, 2);
-        grid.add(transmissionTemperatureField, 1, 2);
-        grid.add(createLabel("Throttle (%):"), 0, 3);
-        grid.add(throttlePositionField, 1, 3);
-        grid.add(createLabel("MAF:"), 0, 4);
-        grid.add(mafReadingField, 1, 4);
-        grid.add(createLabel("O2 Sensor (V):"), 0, 5);
-        grid.add(oxygenSensorVoltageField, 1, 5);
-        grid.add(createLabel("Mileage (km):"), 0, 6);
-        grid.add(mileageField, 1, 6);
-        grid.add(createLabel("Fault Code:"), 0, 7);
-        grid.add(faultCodeField, 1, 7);
-
-        card.getChildren().add(grid);
-        return card;
-    }
-
-
-
-    private Pane buildSubmitPanel() {
-        HBox submitContainer = new HBox();
-        submitContainer.setAlignment(Pos.CENTER);
+        faultGrid.add(createLabel("Fault Code:"), 0, 0);
+        faultGrid.add(faultCodeField, 1, 0);
+        faultSection.getChildren().add(faultGrid);
 
         Button submitButton = new Button("Submit Diagnostic");
         submitButton.getStyleClass().add("dashboard-button");
         submitButton.setMaxWidth(Double.MAX_VALUE);
-        HBox.setHgrow(submitButton, Priority.ALWAYS);
         submitButton.setOnAction(event -> handleSubmit());
+        HBox buttonBox = new HBox(submitButton);
+        buttonBox.setAlignment(Pos.CENTER);
+        HBox.setHgrow(submitButton, Priority.ALWAYS);
+        buttonBox.setPadding(new Insets(8, 0, 0, 0));
 
-        submitContainer.getChildren().add(submitButton);
-        return submitContainer;
-    }
+        formContent.getChildren().addAll(vehicleSection, basicSection, advancedSection, faultSection, buttonBox);
 
-    private VBox buildCenterPanel() {
-        VBox centerPanel = new VBox(14);
-        centerPanel.getStyleClass().add("center-panel");
-        centerPanel.setPadding(new Insets(16));
+        ScrollPane leftScrollPane = new ScrollPane(formContent);
+        leftScrollPane.setFitToWidth(true);
+        leftScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        leftScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        leftScrollPane.setPrefViewportWidth(420);
+        leftScrollPane.setMaxWidth(460);
+        leftScrollPane.setStyle("-fx-background-color: transparent;");
 
-        // Compact result summary
-        HBox summaryRow = new HBox(16);
-        summaryRow.setAlignment(Pos.CENTER_LEFT);
+        VBox resultColumn = new VBox(14);
+        resultColumn.setFillWidth(true);
+        resultColumn.setPadding(new Insets(12));
 
-        resultSummaryLabel = new Label("No diagnostic data yet");
+        VBox resultCard = createCard("Diagnosis Result");
+        resultSummaryLabel = new Label("Awaiting diagnostic submission...");
         resultSummaryLabel.getStyleClass().add("result-summary");
-
-        HBox badges = new HBox(8);
-        healthScoreLabel = new Label("Health: --");
-        healthScoreLabel.getStyleClass().add("health-badge");
-        severityBadgeLabel = new Label("--");
-        severityBadgeLabel.getStyleClass().add("severity-badge");
-        badges.getChildren().addAll(healthScoreLabel, severityBadgeLabel);
-        badges.setAlignment(Pos.CENTER_RIGHT);
-
-        summaryRow.getChildren().addAll(resultSummaryLabel, badges);
-        HBox.setHgrow(resultSummaryLabel, Priority.ALWAYS);
-
-        // Fixed height details area
         resultArea = new TextArea();
         resultArea.setEditable(false);
         resultArea.setWrapText(true);
         resultArea.getStyleClass().add("result-details");
-        resultArea.setPromptText("Diagnostic details and recommendations will appear here...");
-        resultArea.setPrefHeight(200);
-        resultArea.setMaxHeight(200);
+        resultArea.setPrefHeight(320);
+        resultArea.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(resultArea, Priority.ALWAYS);
+        resultCard.getChildren().addAll(resultSummaryLabel, resultArea);
 
-        // Fixed height recommendations area
+        VBox recommendationCard = createCard("Recommendations");
         recommendationsArea = new TextArea();
         recommendationsArea.setEditable(false);
         recommendationsArea.setWrapText(true);
         recommendationsArea.getStyleClass().add("result-recommendations");
-        recommendationsArea.setPromptText("Recommendations will appear here...");
-        recommendationsArea.setPrefHeight(150);
-        recommendationsArea.setMaxHeight(150);
+        recommendationsArea.setPrefHeight(180);
+        recommendationsArea.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(recommendationsArea, Priority.ALWAYS);
+        recommendationCard.getChildren().add(recommendationsArea);
 
-        centerPanel.getChildren().addAll(summaryRow, resultArea, recommendationsArea);
-        return centerPanel;
+        resultColumn.getChildren().addAll(resultCard, recommendationCard);
+        VBox.setVgrow(resultCard, Priority.ALWAYS);
+        VBox.setVgrow(recommendationCard, Priority.ALWAYS);
+
+        SplitPane splitPane = new SplitPane(leftScrollPane, resultColumn);
+        splitPane.setDividerPositions(0.33);
+        splitPane.setPrefWidth(1020);
+        splitPane.setMaxWidth(Double.MAX_VALUE);
+        SplitPane.setResizableWithParent(leftScrollPane, false);
+
+        VBox container = new VBox(splitPane);
+        container.setPadding(new Insets(0));
+        VBox.setVgrow(splitPane, Priority.ALWAYS);
+        return container;
     }
 
-    private VBox buildRightPanel() {
-        VBox analyticsPanel = new VBox(14);
-        analyticsPanel.getStyleClass().add("analytics-panel");
-        analyticsPanel.setPadding(new Insets(16));
+    private VBox buildHistoryTab() {
+        VBox historyRoot = new VBox(12);
+        historyRoot.setPadding(new Insets(16));
 
-        // Compact stats grid
-        GridPane statsGrid = new GridPane();
-        statsGrid.setHgap(16);
-        statsGrid.setVgap(8);
-        statsGrid.getStyleClass().add("stats-grid");
-
-        totalReportsLabel = new Label("0");
-        totalReportsLabel.getStyleClass().add("stat-value");
-        criticalReportsLabel = new Label("0");
-        criticalReportsLabel.getStyleClass().add("stat-value");
-        avgHealthScoreLabel = new Label("--");
-        avgHealthScoreLabel.getStyleClass().add("stat-value");
-
-        statsGrid.add(new Label("Total:"), 0, 0);
-        statsGrid.add(totalReportsLabel, 1, 0);
-        statsGrid.add(new Label("Critical:"), 0, 1);
-        statsGrid.add(criticalReportsLabel, 1, 1);
-        statsGrid.add(new Label("Avg Health:"), 0, 2);
-        statsGrid.add(avgHealthScoreLabel, 1, 2);
-
-        // Fixed height charts
-        severityChart = new PieChart();
-        severityChart.setLegendVisible(false);
-        severityChart.setLabelsVisible(true);
-        severityChart.setPrefHeight(220);
-        severityChart.setMaxHeight(220);
-        severityChart.getStyleClass().add("analytics-chart");
-
-        healthScoreChart = createHealthScoreChart();
-        healthScoreChart.setPrefHeight(220);
-        healthScoreChart.setMaxHeight(220);
-        healthScoreChart.getStyleClass().add("analytics-chart");
-
-        analyticsPanel.getChildren().addAll(statsGrid, severityChart, healthScoreChart);
-        return analyticsPanel;
-    }
-
-    private Pane buildStatsCard() {
-        VBox card = new VBox(10);
-        card.setStyle("-fx-border-radius: 8; -fx-background-radius: 8; -fx-background-color: white; " +
-                "-fx-padding: 16px; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);");
-
-        Label cardTitle = new Label("Analytics Summary");
-        cardTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #1b5e20;");
-
-        Separator sep = new Separator();
-        sep.setStyle("-fx-border-color: #e0e0e0;");
-
-        GridPane grid = new GridPane();
-        grid.setHgap(20);
-        grid.setVgap(12);
-
-        // Total Reports
-        Label totalLabel = new Label("Total Reports");
-        totalLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #555555;");
-        totalReportsLabel = new Label("0");
-        totalReportsLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1b5e20;");
-
-        // Critical Reports
-        Label criticalLabel = new Label("Critical Reports");
-        criticalLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #555555;");
-        criticalReportsLabel = new Label("0");
-        criticalReportsLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #d32f2f;");
-
-        // Avg Health Score
-        Label avgLabel = new Label("Avg Health Score");
-        avgLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #555555;");
-        avgHealthScoreLabel = new Label("--");
-        avgHealthScoreLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #7cb342;");
-
-        grid.add(totalLabel, 0, 0);
-        grid.add(totalReportsLabel, 0, 1);
-        grid.add(criticalLabel, 1, 0);
-        grid.add(criticalReportsLabel, 1, 1);
-        grid.add(avgLabel, 0, 2);
-        grid.add(avgHealthScoreLabel, 0, 3);
-
-        card.getChildren().addAll(cardTitle, sep, grid);
-        return card;
-    }
-
-    private BarChart<String, Number> createHealthScoreChart() {
-        CategoryAxis xAxis = new CategoryAxis();
-        xAxis.setLabel("Vehicle ID");
-        NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Avg Health Score");
-        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-        barChart.setTitle("Avg Health Score by Vehicle");
-        barChart.setStyle("-fx-font-size: 10px;");
-        return barChart;
-    }
-
-    private VBox buildBottomPanel() {
-        VBox historyPanel = new VBox(10);
-        historyPanel.getStyleClass().add("history-panel");
-        historyPanel.setPadding(new Insets(16));
-        historyPanel.setPrefHeight(240);
-        historyPanel.setMaxHeight(240);
-
-        // Filter bar with search and severity filter
         HBox filterBar = new HBox(12);
-        filterBar.getStyleClass().add("history-filter-bar");
         filterBar.setAlignment(Pos.CENTER_LEFT);
+        filterBar.getStyleClass().add("history-filter-bar");
 
-        Label searchLabel = new Label("Search:");
-        searchLabel.getStyleClass().add("form-label");
+        Label searchLabel = createLabel("Search:");
         historySearchField = new TextField();
         historySearchField.setPromptText("Vehicle ID...");
         historySearchField.getStyleClass().add("form-field-small");
-        historySearchField.setPrefWidth(150);
+        historySearchField.setPrefWidth(180);
 
-        Label severityLabel = new Label("Severity:");
-        severityLabel.getStyleClass().add("form-label");
+        Label severityLabel = createLabel("Severity:");
         severityFilterCombo = new ComboBox<>();
         severityFilterCombo.getItems().addAll("All", "CRITICAL", "HIGH", "MEDIUM", "LOW");
         severityFilterCombo.getSelectionModel().selectFirst();
         severityFilterCombo.getStyleClass().add("combo-box");
-        severityFilterCombo.setPrefWidth(100);
+        severityFilterCombo.setPrefWidth(120);
 
         Button refreshButton = new Button("Refresh");
         refreshButton.getStyleClass().add("secondary-button");
@@ -462,16 +329,13 @@ public class MainApp extends Application {
 
         filterBar.getChildren().addAll(searchLabel, historySearchField, severityLabel, severityFilterCombo, refreshButton);
 
-        // Status label
-        statusLabel = new Label("Loading history...");
+        statusLabel = new Label("Loaded 0 reports");
         statusLabel.getStyleClass().add("status-label");
 
-        // History table with CONSTRAINED_RESIZE_POLICY
         historyTable = new TableView<>();
         historyTable.getStyleClass().add("history-table");
         historyTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         historyTable.setPlaceholder(new Label("No diagnostic history available"));
-        historyTable.setPrefHeight(160);
 
         TableColumn<DiagnosticReportHistory, String> timestampCol = new TableColumn<>("Timestamp");
         timestampCol.setCellValueFactory(new PropertyValueFactory<>("timestamp"));
@@ -504,13 +368,87 @@ public class MainApp extends Application {
         historySearchField.textProperty().addListener((observable, oldValue, newValue) -> applyHistoryFilter());
         severityFilterCombo.valueProperty().addListener((observable, oldValue, newValue) -> applyHistoryFilter());
 
-        historyPanel.getChildren().addAll(filterBar, statusLabel, historyTable);
-        return historyPanel;
+        VBox.setVgrow(historyTable, Priority.ALWAYS);
+        historyRoot.getChildren().addAll(filterBar, statusLabel, historyTable);
+        return historyRoot;
+    }
+
+    private VBox buildAnalyticsTab() {
+        VBox analyticsRoot = new VBox(16);
+        analyticsRoot.setPadding(new Insets(16));
+
+        HBox metricsRow = new HBox(12);
+        metricsRow.setFillHeight(true);
+
+        totalReportsLabel = new Label("0");
+        totalReportsLabel.getStyleClass().add("metric-value");
+        criticalReportsLabel = new Label("0");
+        criticalReportsLabel.getStyleClass().add("metric-value");
+        avgHealthScoreLabel = new Label("--");
+        avgHealthScoreLabel.getStyleClass().add("metric-value");
+
+        metricsRow.getChildren().addAll(
+                createMetricCard("Total Reports", totalReportsLabel),
+                createMetricCard("Critical Reports", criticalReportsLabel),
+                createMetricCard("Avg Health Score", avgHealthScoreLabel)
+        );
+
+        HBox chartsRow = new HBox(12);
+        chartsRow.setFillHeight(true);
+
+        severityChart = new PieChart();
+        severityChart.setLegendVisible(false);
+        severityChart.setLabelsVisible(true);
+        severityChart.setPrefHeight(280);
+        severityChart.setMaxHeight(280);
+        severityChart.getStyleClass().add("analytics-chart");
+
+        healthScoreChart = createHealthScoreChart();
+        healthScoreChart.setPrefHeight(280);
+        healthScoreChart.setMaxHeight(280);
+        healthScoreChart.getStyleClass().add("analytics-chart");
+
+        VBox severityCard = createCard("Severity Distribution");
+        VBox.setVgrow(severityChart, Priority.ALWAYS);
+        severityCard.getChildren().add(severityChart);
+
+        VBox healthCard = createCard("Health Score by Vehicle");
+        VBox.setVgrow(healthScoreChart, Priority.ALWAYS);
+        healthCard.getChildren().add(healthScoreChart);
+
+        chartsRow.getChildren().addAll(severityCard, healthCard);
+        HBox.setHgrow(severityCard, Priority.ALWAYS);
+        HBox.setHgrow(healthCard, Priority.ALWAYS);
+
+        analyticsRoot.getChildren().addAll(metricsRow, chartsRow);
+        VBox.setVgrow(chartsRow, Priority.ALWAYS);
+        return analyticsRoot;
+    }
+
+    private VBox createMetricCard(String title, Label valueLabel) {
+        VBox card = createCard(title);
+        valueLabel.getStyleClass().add("metric-value");
+        Label descriptor = new Label(title);
+        descriptor.getStyleClass().add("metric-label");
+        card.getChildren().addAll(valueLabel, descriptor);
+        return card;
+    }
+
+    private BarChart<String, Number> createHealthScoreChart() {
+        CategoryAxis xAxis = new CategoryAxis();
+        xAxis.setLabel("Vehicle ID");
+        NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("Avg Health Score");
+        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+        barChart.setTitle("Avg Health Score by Vehicle");
+        barChart.setLegendVisible(false);
+        return barChart;
     }
 
     private TextField createFormField() {
         TextField field = new TextField();
         field.getStyleClass().add("form-field");
+        field.setPrefHeight(34);
         return field;
     }
 

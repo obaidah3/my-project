@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug DiagnosticServer",
+      "request": "launch",
+      "mainClass": "com.vehiclediag.server.DiagnosticServer",
+      "projectName": "vehicle-diagnostic-system"
+    },
+    {
+      "type": "java",
+      "name": "Debug Console Client",
+      "request": "launch",
+      "mainClass": "com.vehiclediag.client.ClientUI",
+      "projectName": "vehicle-diagnostic-system"
+    },
+    {
+      "type": "java",
+      "name": "Debug JavaFX Dashboard",
+      "request": "launch",
+      "mainClass": "com.vehiclediag.ui.MainApp",
+      "projectName": "vehicle-diagnostic-system"
+    }
+  ]
+}
